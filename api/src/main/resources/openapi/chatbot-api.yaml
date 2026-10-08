@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: ApiRest del Chatbot - Oficina de Agua
+  description: Contrato entre el BFF y el backend Java del chatbot con RAG.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8081
+    description: Local
+tags:
+  - name: Chat
+    description: Preguntas al chatbot
+paths:
+  /api/v1/chat:
+    post:
+      tags: [Chat]
+      operationId: askQuestion
+      summary: Envía una pregunta y recibe la respuesta con sus fuentes
+      description: >
+        Si no hay información relevante en el contenido de la oficina,
+        responde 200 con un mensaje de cortesía y la lista de fuentes vacía.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Respuesta generada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/LlmUnavailable'
+        '504':
+          $ref: '#/components/responses/LlmTimeout'
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required: [question]
+      properties:
+        question:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: ¿Cómo se calcula mi consumo de agua?
+        sessionId:
+          type: string
+          maxLength: 64
+          description: Identificador anónimo de la conversación (opcional, sin datos personales).
+    ChatResponse:
+      type: object
+      required: [answer, sources]
+      properties:
+        answer:
+          type: string
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+    Source:
+      type: object
+      required: [document]
+      properties:
+        document:
+          type: string
+          example: calculo-consumo.md
+        section:
+          type: string
+          example: Cuota mínima y excedente
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [INVALID_QUESTION, RATE_LIMITED, LLM_UNAVAILABLE, LLM_TIMEOUT, INTERNAL_ERROR]
+        message:
+          type: string
+          description: Mensaje amigable, sin detalles internos.
+  responses:
+    BadRequest:
+      description: Pregunta vacía, demasiado larga o con formato inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Demasiadas preguntas en poco tiempo
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Error interno
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    LlmUnavailable:
+      description: El proveedor del LLM no está disponible
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    LlmTimeout:
+      description: El LLM tardó demasiado en responder
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
