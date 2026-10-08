@@ -1,4 +1,4 @@
-﻿# Oficina del Agua — Feature 2: Chatbot con RAG
+﻿# Oficina de Agua — Feature 2: Chatbot con RAG
 
 Fase 2 · Desarrollo Web 2026 · Universidad Mariano Gálvez
 
