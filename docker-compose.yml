@@ -1,1 +1,9 @@
-services: {}
+services:
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8082:8080"
+    environment:
+      SWAGGER_JSON: /spec/chatbot-api.yaml
+    volumes:
+      - ./api/src/main/resources/openapi/chatbot-api.yaml:/spec/chatbot-api.yaml:ro
