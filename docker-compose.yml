@@ -7,3 +7,32 @@ services:
       SWAGGER_JSON: /spec/chatbot-api.yaml
     volumes:
       - ./api/src/main/resources/openapi/chatbot-api.yaml:/spec/chatbot-api.yaml:ro
+
+  # HU-30: Vector database exclusiva del chatbot (separada de la BD del monolito)
+  postgres-pgvector:
+    image: pgvector/pgvector:pg17
+    container_name: chatbot-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgvector-data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chatbot-net
+
+volumes:
+  pgvector-data:
+
+networks:
+  chatbot-net:
+    name: chatbot-net
