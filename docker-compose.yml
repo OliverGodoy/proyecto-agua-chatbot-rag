@@ -31,8 +31,41 @@ services:
     networks:
       - chatbot-net
 
+  # HU-38: DynamoDB Local para registrar cada prompt-response del chatbot
+  dynamodb-local:
+    image: amazon/dynamodb-local
+    container_name: chatbot-dynamodb
+    restart: unless-stopped
+    user: root
+    working_dir: /home/dynamodblocal
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    ports:
+      - "8000:8000"
+    volumes:
+      - dynamodb-data:/home/dynamodblocal/data
+    networks:
+      - chatbot-net
+
+  # Crea la tabla al levantar (se ejecuta una vez y termina)
+  dynamodb-init:
+    image: amazon/aws-cli
+    container_name: chatbot-dynamodb-init
+    depends_on:
+      - dynamodb-local
+    environment:
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
+      AWS_DEFAULT_REGION: us-east-1
+      DYNAMODB_TABLE: ${DYNAMODB_TABLE:-chatbot-interacciones}
+    entrypoint: ["/bin/sh", "/init/crear-tabla.sh"]
+    volumes:
+      - ./db/dynamodb:/init:ro
+    networks:
+      - chatbot-net
+
 volumes:
   pgvector-data:
+  dynamodb-data:
 
 networks:
   chatbot-net:
