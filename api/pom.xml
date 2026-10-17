@@ -47,6 +47,11 @@
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>dynamodb</artifactId>
 		</dependency>
+		<!-- Despliegue: /actuator/health para el health check del balanceador -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
 		<!-- HU-33: acceso a la Vector database (Postgres + pgvector) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

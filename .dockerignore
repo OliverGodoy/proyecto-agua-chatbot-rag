@@ -1,0 +1,5 @@
+# Solo entran a la imagen el .jar compilado y el contenido de referencia.
+*
+!api/target/chatbot-api-*.jar
+!content/
+!content/**
