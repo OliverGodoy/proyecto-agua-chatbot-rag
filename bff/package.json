@@ -1,0 +1,13 @@
+{
+  "name": "oficina-agua-chatbot-bff",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend-for-frontend para el chat de la Oficina de Agua",
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "start": "node --env-file=.env src/server.js",
+    "test": "node --test"
+  }
+}
