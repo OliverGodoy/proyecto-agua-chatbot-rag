@@ -5,6 +5,7 @@ out/
 target/
 node_modules/
 .next/
+api/secrets.properties
 
 .DB_Store
 Thumbs.db

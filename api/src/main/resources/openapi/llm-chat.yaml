@@ -1,0 +1,60 @@
+openapi: 3.0.3
+info:
+  title: LLM compatible con OpenAI
+  description: Subconjunto de la API de chat de OpenAI. Ollama expone el mismo formato.
+  version: 1.0.0
+servers:
+  - url: https://api.openai.com
+tags:
+  - name: Llm
+paths:
+  /v1/chat/completions:
+    post:
+      tags: [Llm]
+      operationId: crearChatCompletion
+      summary: Genera una respuesta de chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+      responses:
+        '200':
+          description: Respuesta generada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionResponse'
+components:
+  schemas:
+    ChatMessage:
+      type: object
+      required: [role]
+      properties:
+        role:
+          type: string
+        content:
+          type: string
+    ChatCompletionRequest:
+      type: object
+      required: [model, messages]
+      properties:
+        model:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+    ChatCompletionResponse:
+      type: object
+      properties:
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatChoice'
+    ChatChoice:
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/ChatMessage'
