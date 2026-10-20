@@ -1,0 +1,258 @@
+/*
+ * Estilos del widget de chat. Usa la paleta de agua del sistema: si la página ya define
+ * --oa-navy, --oa-blue, etc. (como globals.css de la consulta pública), las hereda; si no,
+ * usa los mismos valores por defecto. Para cambiar un color basta con definir --oa-chat-*.
+ */
+.oa-chat {
+  --c-navy: var(--oa-chat-navy, var(--oa-navy, #04263d));
+  --c-blue: var(--oa-chat-blue, var(--oa-blue, #35a0d8));
+  --c-blue-light: var(--oa-chat-blue-light, var(--oa-blue-light, #eaf7ff));
+  --c-yellow: var(--oa-chat-yellow, var(--oa-yellow, #ffd500));
+  --c-yellow-dark: var(--oa-chat-yellow-dark, var(--oa-yellow-dark, #e6bf00));
+  --c-texto: var(--oa-chat-texto, var(--texto, #1c2b36));
+  --c-suave: var(--oa-chat-suave, var(--texto-suave, #52606b));
+  --c-borde: var(--oa-chat-borde, var(--borde, #c9d8e2));
+  --c-error: var(--oa-chat-error, var(--error, #b42318));
+  --c-error-fondo: var(--oa-chat-error-fondo, var(--error-fondo, #fdecea));
+
+  font-family: var(--oa-chat-fuente, inherit);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--c-texto);
+}
+
+.oa-chat *,
+.oa-chat *::before,
+.oa-chat *::after {
+  box-sizing: border-box;
+}
+
+.oa-chat button:focus-visible,
+.oa-chat textarea:focus-visible {
+  outline: 3px solid var(--c-blue);
+  outline-offset: 2px;
+}
+
+/* ---------- Botón flotante ---------- */
+
+.oa-chat__lanzador {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c-yellow);
+  color: var(--c-navy);
+  box-shadow: 0 6px 18px rgba(4, 38, 61, 0.3);
+  cursor: pointer;
+}
+
+.oa-chat__lanzador:hover {
+  background: var(--c-yellow-dark);
+}
+
+/* ---------- Panel ---------- */
+
+.oa-chat__panel {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.5rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  width: min(24rem, calc(100vw - 2rem));
+  height: min(34rem, calc(100dvh - 7rem));
+  overflow: hidden;
+  border: 1px solid var(--c-borde);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(4, 38, 61, 0.28);
+}
+
+.oa-chat__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--c-navy);
+  color: #fff;
+}
+
+.oa-chat__titulo {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.oa-chat__cerrar {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---------- Mensajes ---------- */
+
+.oa-chat__mensajes {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  overflow-y: auto;
+  background: var(--c-blue-light);
+}
+
+.oa-chat__burbuja {
+  max-width: 88%;
+  padding: 0.55rem 0.8rem;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.oa-chat__burbuja--asistente {
+  align-self: flex-start;
+  border: 1px solid var(--c-borde);
+  border-bottom-left-radius: 4px;
+  background: #fff;
+}
+
+.oa-chat__burbuja--usuario {
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  background: var(--c-navy);
+  color: #fff;
+}
+
+.oa-chat__burbuja--error {
+  align-self: flex-start;
+  border: 1px solid var(--c-error);
+  background: var(--c-error-fondo);
+  color: var(--c-error);
+}
+
+.oa-chat__fuentes {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  color: var(--c-suave);
+}
+
+.oa-chat__escribiendo {
+  display: flex;
+  align-self: flex-start;
+  gap: 0.3rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--c-borde);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.oa-chat__escribiendo span {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--c-blue);
+  animation: oa-chat-salto 1.1s infinite ease-in-out;
+}
+
+.oa-chat__escribiendo span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.oa-chat__escribiendo span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes oa-chat-salto {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-0.3rem); opacity: 1; }
+}
+
+/* ---------- Formulario ---------- */
+
+.oa-chat__formulario {
+  padding: 0.5rem 0.75rem 0.75rem;
+  border-top: 1px solid var(--c-borde);
+  background: #fff;
+}
+
+.oa-chat__aviso,
+.oa-chat__contador {
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
+  color: var(--c-suave);
+}
+
+.oa-chat__contador {
+  margin: 0.3rem 0 0;
+  text-align: right;
+}
+
+.oa-chat__fila {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.oa-chat__campo {
+  flex: 1;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--c-borde);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 1rem; /* 16 px: evita el zoom automático en iPhone */
+  color: var(--c-texto);
+  resize: none;
+}
+
+.oa-chat__enviar {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--c-yellow);
+  color: #332b00;
+  cursor: pointer;
+}
+
+.oa-chat__enviar:hover:not(:disabled) {
+  background: var(--c-yellow-dark);
+}
+
+.oa-chat__enviar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Celular: el chat ocupa toda la pantalla ---------- */
+
+@media (max-width: 30rem) {
+  .oa-chat__panel {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .oa-chat__lanzador[aria-expanded='true'] {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oa-chat__escribiendo span {
+    animation: none;
+  }
+}
