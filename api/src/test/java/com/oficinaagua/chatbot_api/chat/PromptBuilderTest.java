@@ -18,7 +18,8 @@ class PromptBuilderTest {
 
         assertThat(prompt.sistema())
                 .contains("Responde únicamente con la información del CONTEXTO")
-                .contains("No inventes");
+                .contains("No inventes")
+                .contains(PromptBuilder.MARCA_SIN_INFORMACION);
     }
 
     @Test

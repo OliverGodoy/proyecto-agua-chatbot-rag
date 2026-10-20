@@ -5,6 +5,7 @@ import java.net.http.HttpTimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,18 +17,32 @@ import com.oficinaagua.chatbot_api.llm.cliente.model.ChatMessage;
 
 import feign.FeignException;
 
-/** HU-35: implementa LlmClient con el cliente Feign generado desde llm-chat.yaml. */
+/**
+ * HU-35: implementa LlmClient con el cliente Feign generado desde llm-chat.yaml.
+ * HU-39: reintenta una vez las fallas temporales del proveedor (429, 5xx o sin conexión),
+ * detectadas en la prueba de estabilidad. Los timeouts no se reintentan para no duplicar la espera.
+ */
 @Service
 public class ProveedorLlmClient implements LlmClient {
 
     private static final Logger log = LoggerFactory.getLogger(ProveedorLlmClient.class);
 
+    static final int MAX_INTENTOS = 2;
+    private static final long ESPERA_ENTRE_INTENTOS_MS = 1000;
+
     private final LlmApiClient api;
     private final LlmProperties props;
+    private final long esperaMs;
 
+    @Autowired
     public ProveedorLlmClient(LlmApiClient api, LlmProperties props) {
+        this(api, props, ESPERA_ENTRE_INTENTOS_MS);
+    }
+
+    ProveedorLlmClient(LlmApiClient api, LlmProperties props, long esperaMs) {
         this.api = api;
         this.props = props;
+        this.esperaMs = esperaMs;
     }
 
     @Override
@@ -37,18 +52,45 @@ public class ProveedorLlmClient implements LlmClient {
                 .addMessagesItem(new ChatMessage().role("system").content(prompt.sistema()))
                 .addMessagesItem(new ChatMessage().role("user").content(prompt.usuario()));
 
-        ResponseEntity<ChatCompletionResponse> respuesta;
-        try {
-            respuesta = api.crearChatCompletion(peticion);
-        } catch (FeignException e) {
-            throw traducir(e);
-        }
+        ResponseEntity<ChatCompletionResponse> respuesta = llamar(peticion);
 
         String texto = extraerTexto(respuesta.getBody());
         if (texto == null || texto.isBlank()) {
             throw new LlmNoDisponibleException("El LLM devolvió una respuesta vacía");
         }
         return texto.strip();
+    }
+
+    private ResponseEntity<ChatCompletionResponse> llamar(ChatCompletionRequest peticion) {
+        for (int intento = 1; ; intento++) {
+            try {
+                return api.crearChatCompletion(peticion);
+            } catch (FeignException e) {
+                if (intento < MAX_INTENTOS && esReintentable(e)) {
+                    log.warn("El LLM falló temporalmente (HTTP {}), reintentando", e.status());
+                    esperar();
+                    continue;
+                }
+                throw traducir(e);
+            }
+        }
+    }
+
+    /** Solo fallas temporales: límite de peticiones, errores del servidor o sin conexión. */
+    private static boolean esReintentable(FeignException e) {
+        if (esTimeout(e)) {
+            return false;
+        }
+        int estado = e.status();
+        return estado == 429 || estado >= 500 || estado == -1;
+    }
+
+    private void esperar() {
+        try {
+            Thread.sleep(esperaMs);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static String extraerTexto(ChatCompletionResponse cuerpo) {

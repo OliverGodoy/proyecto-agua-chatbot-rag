@@ -2,6 +2,7 @@ package com.oficinaagua.chatbot_api.chat;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -71,11 +72,22 @@ public class ChatService {
                 throw new LlmNoDisponibleException("No hay un proveedor de LLM configurado");
             }
             respuesta = cliente.generar(promptBuilder.construir(pregunta, relevantes));
-            fuentes = fuentesDe(relevantes);
+            if (indicaSinInformacion(respuesta)) {
+                // El contexto recuperado no tenía la respuesta: no se muestran fuentes sin relación.
+                log.info("El LLM indicó que el contexto no contiene la respuesta");
+                respuesta = SIN_INFORMACION;
+                fuentes = List.of();
+            } else {
+                fuentes = fuentesDe(relevantes);
+            }
         }
 
         registro.registrar(pregunta, respuesta, fuentes);
         return new ChatResponse().answer(respuesta).sources(fuentes);
+    }
+
+    private static boolean indicaSinInformacion(String respuesta) {
+        return respuesta.toUpperCase(Locale.ROOT).contains(PromptBuilder.MARCA_SIN_INFORMACION);
     }
 
     /** Una fuente por documento y sección, en orden de similitud. */

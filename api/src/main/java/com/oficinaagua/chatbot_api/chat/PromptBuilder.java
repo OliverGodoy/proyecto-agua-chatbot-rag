@@ -10,12 +10,15 @@ import com.oficinaagua.chatbot_api.llm.Prompt;
 @Component
 public class PromptBuilder {
 
+    /** Marca que el LLM devuelve cuando el contexto no contiene la respuesta (HU-39). */
+    public static final String MARCA_SIN_INFORMACION = "SIN_INFORMACION";
+
     static final String INSTRUCCIONES = """
             Eres el asistente virtual de la Oficina de Agua.
             Reglas:
             1. Responde únicamente con la información del CONTEXTO. No uses conocimiento externo.
-            2. Si el CONTEXTO no contiene la respuesta, di que no tienes esa información \
-            y sugiere comunicarse directamente con la oficina.
+            2. Si el CONTEXTO no contiene la respuesta, responde únicamente con la palabra \
+            SIN_INFORMACION, sin agregar nada más.
             3. No inventes montos, tarifas, fechas, horarios, direcciones ni requisitos.
             4. Responde en español, de forma clara, amable y breve.
             5. No pidas ni repitas datos personales (nombre, DPI, teléfono, correo o número de contador).
