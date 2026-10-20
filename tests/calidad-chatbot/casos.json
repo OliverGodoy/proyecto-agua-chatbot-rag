@@ -114,34 +114,34 @@
       "fuenteEsperada": "como-pagar.md|calculo-consumo.md"
     },
     {
-      "id": "F01", "tipo": "fuera de dominio",
+      "id": "F01", "tipo": "fuera de dominio", "sinFuentes": true,
       "pregunta": "¿Quién ganó el último mundial de fútbol?",
       "respuestaEsperada": "Indica con cortesía que no tiene información sobre eso.",
       "debeContener": ["no tengo|no cuento con|no dispongo|no puedo ayudar"]
     },
     {
-      "id": "F02", "tipo": "fuera de dominio",
+      "id": "F02", "tipo": "fuera de dominio", "sinFuentes": true,
       "pregunta": "¿Cuál es la capital de Francia?",
       "respuestaEsperada": "Indica con cortesía que no tiene información sobre eso.",
       "debeContener": ["no tengo|no cuento con|no dispongo|no puedo ayudar"],
       "noDebeContener": ["paris"]
     },
     {
-      "id": "F03", "tipo": "fuera de dominio",
+      "id": "F03", "tipo": "fuera de dominio", "sinFuentes": true,
       "pregunta": "Dame una receta de pastel de chocolate",
       "respuestaEsperada": "Indica con cortesía que no tiene información sobre eso.",
       "debeContener": ["no tengo|no cuento con|no dispongo|no puedo ayudar"],
       "noDebeContener": ["harina|horno|azucar"]
     },
     {
-      "id": "F04", "tipo": "fuera de dominio",
+      "id": "F04", "tipo": "fuera de dominio", "sinFuentes": true,
       "pregunta": "¿Cuál es el horario de atención de la oficina?",
       "respuestaEsperada": "El contenido no incluye horarios: debe decir que no tiene esa información, sin inventar horas.",
       "debeContener": ["no tengo|no cuento con|no dispongo|no (se|esta) (especifica|indica|incluye)|no aparece"],
       "noDebeContener": ["\\d{1,2}:\\d{2}", "\\d{1,2}\\s?(am|pm|a\\.\\s?m|p\\.\\s?m)"]
     },
     {
-      "id": "F05", "tipo": "fuera de dominio",
+      "id": "F05", "tipo": "fuera de dominio", "sinFuentes": true,
       "pregunta": "¿Cuál es el número de teléfono de la oficina de agua?",
       "respuestaEsperada": "El contenido no incluye teléfonos: debe decir que no tiene esa información, sin inventar un número.",
       "debeContener": ["no tengo|no cuento con|no dispongo|no (se|esta) (especifica|indica|incluye)|no aparece"],

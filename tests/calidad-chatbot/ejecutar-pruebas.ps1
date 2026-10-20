@@ -82,6 +82,9 @@ function Evaluar($caso, $res) {
         foreach ($patron in @($caso.noDebeContener)) {
             if ($patron -and $normalizada -match $patron) { $fallos += "contiene lo que no debía: $patron" }
         }
+        if ($caso.sinFuentes -and @($res.json.sources | Where-Object { $_ }).Count -gt 0) {
+            $fallos += "devolvió fuentes, pero no tiene la información"
+        }
         if ($caso.fuenteEsperada) {
             $documentos = (@($res.json.sources | Where-Object { $_ } | ForEach-Object { $_.document }) -join " ")
             if ($documentos -notmatch $caso.fuenteEsperada) { $fallos += "falta la fuente: $($caso.fuenteEsperada)" }

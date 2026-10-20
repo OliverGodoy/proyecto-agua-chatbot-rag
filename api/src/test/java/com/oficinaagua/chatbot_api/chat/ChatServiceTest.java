@@ -88,6 +88,19 @@ class ChatServiceTest {
     }
 
     @Test
+    void siElLlmIndicaQueNoTieneLaInformacionNoDevuelveFuentes() {
+        when(busqueda.buscarSimilares(VECTOR, 4)).thenReturn(List.of(
+                new FragmentoEncontrado("fugas.md", "Aviso de fugas", "Avise a la oficina.", 0.42)));
+        when(llm.generar(any(Prompt.class))).thenReturn("SIN_INFORMACION");
+
+        ChatResponse respuesta = servicio.responder("¿Cómo pago?");
+
+        assertThat(respuesta.getAnswer()).isEqualTo(ChatService.SIN_INFORMACION);
+        assertThat(respuesta.getSources()).isEmpty();
+        verify(registro).registrar("¿Cómo pago?", ChatService.SIN_INFORMACION, List.of());
+    }
+
+    @Test
     void unaPreguntaConSoloEspaciosEsInvalida() {
         assertThatThrownBy(() -> servicio.responder("   "))
                 .isInstanceOf(PreguntaInvalidaException.class);

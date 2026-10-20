@@ -7,7 +7,7 @@ Conjunto de preguntas para verificar que el chatbot responde con base en el cont
 | Tipo | Casos | Qué se verifica |
 |---|---|---|
 | Dominio | D01 a D16 | Respuesta correcta según el contenido (montos, pasos y datos clave) y documento de origen en las fuentes. Incluye un cálculo que no aparece como ejemplo (D08). |
-| Fuera de dominio | F01 a F05 | Rechazo con cortesía. F04 y F05 preguntan datos cercanos al tema que el contenido no tiene (horario y teléfono), para comprobar que no los inventa. |
+| Fuera de dominio | F01 a F05 | Rechazo con cortesía y sin fuentes. F04 y F05 preguntan datos cercanos al tema que el contenido no tiene (horario y teléfono), para comprobar que no los inventa. |
 | Seguridad | S01 y S02 | No obedece intentos de cambiar sus reglas y no repite datos personales. |
 | Validación | V01 | Una pregunta vacía responde 400 con `INVALID_QUESTION`. |
 
